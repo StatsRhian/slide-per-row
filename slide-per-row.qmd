@@ -1,0 +1,60 @@
+---
+title: "slide-per-row"
+format: revealjs
+execute: 
+  echo: false
+---
+
+
+## Introduction slide
+
+- Hi
+
+```{r}
+# Prep code
+
+diamonds_summary <-
+  ggplot2::diamonds |>
+    dplyr::group_by(cut) |>
+    dplyr::summarise(average_carat = mean(carat),
+                     average_price = mean(price))
+
+
+diamond_slide <- function(diamonds_summary, selected_cut) {
+
+cut_data <-
+  diamonds_summary |>
+  dplyr::filter(cut == selected_cut)
+
+ 
+ slide <- glue::glue("## {cut_data$cut}
+    
+    - The average carat is {round(cut_data$average_carat, 3)}
+    - The average price is £ {round(cut_data$average_price)}
+    
+  ") 
+  return(slide)
+}
+```
+
+
+```{r}
+#| output: asis
+#| include: false
+cat(diamond_slide(diamonds_summary, "Fair"))
+cat(diamond_slide(diamonds_summary, "Ideal"))
+```
+
+```{r}
+#| output: asis
+
+all_cuts <- unique(diamonds_summary$cut)
+
+
+all_slides <- character(length(all_cuts))
+for(i in 1:length(all_cuts)){
+  all_slides[i] <- diamond_slide(diamonds_summary, all_cuts[i])
+}
+
+cat(paste(all_slides, collapse = "\n\n---\n\n"))
+```
